@@ -12,7 +12,7 @@ export default function RegistrarPersonal() {
     password: "",
     password2: "",
     fecha_nacimiento: "",
-    // experiencia y foto_url fuera, porque no existen en la tabla actual
+    foto_url: ""
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -53,11 +53,12 @@ export default function RegistrarPersonal() {
         <option value="Pasaporte">Pasaporte</option>
       </select>
       <input name="numero_documento" placeholder="Número de documento" className="mb-2 w-full p-2 border rounded" onChange={handleChange} required />
+      <input name="fecha_nacimiento" type="date" placeholder="Fecha de nacimiento" className="mb-2 w-full p-2 border rounded" onChange={handleChange} required />
       <input name="email" type="email" placeholder="Correo electrónico" className="mb-2 w-full p-2 border rounded" onChange={handleChange} required />
       <input name="telefono" placeholder="Teléfono" className="mb-2 w-full p-2 border rounded" onChange={handleChange} required />
+      <input name="foto_url" placeholder="URL de foto de perfil" className="mb-2 w-full p-2 border rounded" onChange={handleChange} />
       <input name="password" type="password" placeholder="Contraseña" className="mb-2 w-full p-2 border rounded" onChange={handleChange} required />
       <input name="password2" type="password" placeholder="Confirmar contraseña" className="mb-4 w-full p-2 border rounded" onChange={handleChange} required />
-      <input name="fecha_nacimiento" type="date" placeholder="Fecha de nacimiento" className="mb-4 w-full p-2 border rounded" onChange={handleChange} required />
       {error && <div className="text-red-600 mb-2">{error}</div>}
       {success && <div className="text-green-600 mb-2">{success}</div>}
       <button className="w-full py-2 bg-teal-600 text-white rounded font-bold">Registrar personal</button>
