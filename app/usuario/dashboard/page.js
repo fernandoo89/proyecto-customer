@@ -12,8 +12,6 @@ export default function UsuarioDashboard() {
     hora: "",
     notas: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [solicitudes, setSolicitudes] = useState([]);
   const [loadingSolicitudes, setLoadingSolicitudes] = useState(true);
 
@@ -35,43 +33,16 @@ export default function UsuarioDashboard() {
       .then(r => r.json())
       .then(setSolicitudes)
       .finally(() => setLoadingSolicitudes(false));
-  }, [user, message]); // <---- Refresca la lista cuando cambia el mensaje (por nueva solicitud)
+  }, [user]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  // NUEVO handle: solo guarda los datos y redirige, NO fetch
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/solicitudes/crear", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          usuario_id: user.id,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("✅ Solicitud creada exitosamente");
-        setForm({
-          direccion: "",
-          tipo_limpieza: "Profunda",
-          fecha: "",
-          hora: "",
-          notas: "",
-        });
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        setMessage("❌ " + (data.error || "Error al crear la solicitud"));
-      }
-    } catch (err) {
-      setMessage("❌ Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
+    localStorage.setItem("solicitudPendiente", JSON.stringify(form));
+    router.push("/solicitar/seleccionar-personal");
   };
 
   const handleLogout = () => {
@@ -79,10 +50,8 @@ export default function UsuarioDashboard() {
     router.push("/");
   };
 
-  // Cancelar solicitud (sólo interfaz, endpoint real a implementar)
   const cancelarSolicitud = async (id) => {
-    alert("Funcionalidad para cancelar solicitud próximamente");
-    // Aquí llamarás al endpoint real en el futuro y refrescarás la lista
+    alert("Funcionalidad para cancelar solicitud próximamente.");
   };
 
   if (!user) {
@@ -111,7 +80,6 @@ export default function UsuarioDashboard() {
           onSubmit={handleSubmit}
           className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-teal-500"
         >
-          {/* Dirección */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Dirección:
@@ -126,7 +94,6 @@ export default function UsuarioDashboard() {
               required
             />
           </div>
-          {/* Tipo de limpieza */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Tipo de limpieza:
@@ -143,7 +110,6 @@ export default function UsuarioDashboard() {
               <option value="Mantenimiento">Mantenimiento</option>
             </select>
           </div>
-          {/* Fecha */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Fecha:
@@ -157,7 +123,6 @@ export default function UsuarioDashboard() {
               required
             />
           </div>
-          {/* Hora */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Hora:
@@ -171,7 +136,6 @@ export default function UsuarioDashboard() {
               required
             />
           </div>
-          {/* Notas adicionales */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Notas adicionales:
@@ -184,19 +148,11 @@ export default function UsuarioDashboard() {
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 h-24 resize-none"
             />
           </div>
-          {/* Mensaje de estado */}
-          {message && (
-            <div className="mb-6 p-4 rounded bg-gray-100 text-center font-semibold">
-              {message}
-            </div>
-          )}
-          {/* Botón enviar */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-teal-500 text-white font-bold rounded hover:bg-teal-600 disabled:bg-gray-400 transition"
+            className="w-full py-3 bg-teal-500 text-white font-bold rounded hover:bg-teal-600 transition"
           >
-            {loading ? "Solicitando..." : "Solicitar limpieza"}
+            Solicitar limpieza
           </button>
         </form>
 
