@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-// NO type Personal aquí
-
 export default function SeleccionaPersonalPage() {
   const router = useRouter();
   const [personal, setPersonal] = useState([]);
@@ -27,7 +25,7 @@ export default function SeleccionaPersonalPage() {
       .catch(() => setPersonal([]));
   }, []);
 
-  const seleccionarPersonal = async (p) => { // Quita el tipado ": Personal"
+  const seleccionarPersonal = async (p) => {
     if (!solicitud) return;
     setLoading(true);
     setMessage("");
@@ -37,7 +35,7 @@ export default function SeleccionaPersonalPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...solicitud,
+          ...solicitud,            // ya trae monto desde el paso anterior
           usuario_id: user.id,
           personal_id: p.id,
         }),

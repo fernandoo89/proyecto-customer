@@ -2,6 +2,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+// Precios fijos según tipo de limpieza
+const PRECIOS_LIMPIEZA = {
+  Profunda: 80,
+  Ligera: 40,
+  "Desinfección": 60,
+  Mantenimiento: 30,
+};
+
 export default function UsuarioDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -15,7 +23,6 @@ export default function UsuarioDashboard() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loadingSolicitudes, setLoadingSolicitudes] = useState(true);
 
-  // Obtener usuario logueado
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
@@ -25,7 +32,6 @@ export default function UsuarioDashboard() {
     setUser(JSON.parse(userData));
   }, [router]);
 
-  // Cargar solicitudes del usuario
   useEffect(() => {
     if (!user) return;
     setLoadingSolicitudes(true);
@@ -38,10 +44,11 @@ export default function UsuarioDashboard() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // NUEVO handle: solo guarda los datos y redirige, NO fetch
+  // Nuevo: guarda los datos + monto y redirige
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem("solicitudPendiente", JSON.stringify(form));
+    const monto = PRECIOS_LIMPIEZA[form.tipo_limpieza] || 0;
+    localStorage.setItem("solicitudPendiente", JSON.stringify({ ...form, monto }));
     router.push("/solicitar/seleccionar-personal");
   };
 
@@ -73,13 +80,14 @@ export default function UsuarioDashboard() {
           Cerrar Sesión
         </button>
       </div>
-
       <main className="max-w-2xl mx-auto pb-8">
+
         {/* FORMULARIO */}
         <form
           onSubmit={handleSubmit}
           className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-teal-500"
         >
+          {/* Dirección */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Dirección:
@@ -94,6 +102,7 @@ export default function UsuarioDashboard() {
               required
             />
           </div>
+          {/* Tipo de limpieza */}
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Tipo de limpieza:
@@ -110,6 +119,14 @@ export default function UsuarioDashboard() {
               <option value="Mantenimiento">Mantenimiento</option>
             </select>
           </div>
+
+          {/* Muestra el monto dinámico */}
+          <p className="mb-4 text-lg text-teal-700 font-semibold">
+            Monto a pagar: <span className="text-purple-700">
+              S/ {PRECIOS_LIMPIEZA[form.tipo_limpieza] || "--"}
+            </span>
+          </p>
+
           <div className="mb-6">
             <label className="block text-teal-600 font-semibold mb-2">
               Fecha:
@@ -172,6 +189,7 @@ export default function UsuarioDashboard() {
                 <div><b>Tipo:</b> {s.tipo_limpieza}</div>
                 <div><b>Fecha:</b> {s.fecha} <b>Hora:</b> {s.hora}</div>
                 <div><b>Notas:</b> {s.notas || "—"}</div>
+                <div><b>Monto:</b> S/ {s.monto || "--"}</div>
                 <div><b>Estado:</b> {s.estado}</div>
                 <div className="flex gap-2 mt-2">
                   {["pendiente", "confirmado"].includes(s.estado) && (
